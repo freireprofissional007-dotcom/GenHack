@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>genhack</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2535;
+  --bg4: #252d40;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --red: #e05c5c;
+  --red-bg: rgba(224,92,92,0.1);
+  --red-border: rgba(224,92,92,0.3);
+  --green: #3dba7e;
+  --green-bg: rgba(61,186,126,0.1);
+  --green-border: rgba(61,186,126,0.3);
+  --gray-repute: #6b7a9a;
+  --gray-bg: rgba(107,122,154,0.1);
+  --gray-border: rgba(107,122,154,0.25);
+  --amber: #f0a030;
+  --amber-bg: rgba(240,160,48,0.1);
+  --blue: #5b9cf6;
+  --blue-bg: rgba(91,156,246,0.12);
+  --teal: #30cca8;
+  --teal-bg: rgba(48,204,168,0.1);
+  --text: #dde3f0;
+  --text2: #8a95b0;
+  --text3: #4a536b;
+  --mono: 'JetBrains Mono','Fira Code','Courier New',monospace;
+  --sans: 'Inter',system-ui,sans-serif;
+  --card-radius: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; line-height: 1.5; }
+
+/* ── HEADER ── */
+.header {
+  height: 52px; padding: 0 1.5rem;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  position: sticky; top: 0; z-index: 200;
+}
+.logo { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); }
+.logo-dna { font-size: 18px; }
+.logo span { color: var(--teal); }
+.header-badges { display: flex; gap: 8px; margin-left: 8px; }
+.hbadge { font-size: 10px; font-family: var(--mono); background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 7px; color: var(--text2); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+.file-chip { font-size: 11px; font-family: var(--mono); color: var(--teal); background: var(--teal-bg); border: 1px solid var(--green-border); border-radius: 4px; padding: 3px 9px; }
+
+/* ── UPLOAD ── */
+#upload-section { max-width: 720px; margin: 5rem auto; padding: 0 2rem; }
+.upload-hero { text-align: center; margin-bottom: 2.5rem; }
+.upload-hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.05em; color: var(--text); margin-bottom: 0.3rem; }
+.upload-hero h1 span { color: var(--teal); }
+.upload-hero p { color: var(--text2); font-size: 13px; }
+.upload-zone {
+  border: 2px dashed var(--border2); border-radius: 14px;
+  padding: 3rem 2rem; text-align: center; cursor: pointer;
+  background: var(--bg2); position: relative; transition: all 0.2s;
+}
+.upload-zone:hover, .upload-zone.drag-over { border-color: var(--teal); background: rgba(48,204,168,0.06); }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 40px; display: block; margin-bottom: 1rem; }
+.upload-zone h2 { font-size: 16px; font-weight: 600; margin-bottom: 0.3rem; }
+.upload-zone p { color: var(--text2); font-size: 12px; }
+.chips { margin-top: 1rem; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.chip { font-size: 10px; font-family: var(--mono); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 8px; color: var(--text2); }
+.demo-btn { margin-top: 1.5rem; background: var(--bg3); border: 1px solid var(--border2); color: var(--text2); border-radius: 7px; padding: 8px 18px; cursor: pointer; font-size: 12px; font-family: var(--sans); transition: all 0.15s; }
+.demo-btn:hover { background: var(--bg4); color: var(--text); }
+.privacy-note { margin-top: 1.2rem; font-size: 11px; color: var(--text3); text-align: center; }
+
+/* ── LAYOUT ── */
+#results-section { display: none; }
+.app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 52px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--bg2); border-right: 1px solid var(--border);
+  padding: 1rem; position: sticky; top: 52px;
+  height: calc(100vh - 52px); overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 1.2rem; }
+.stat-box { background: var(--bg3); border-radius: 7px; padding: 10px; }
+.stat-box .lbl { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.stat-box .val { font-size: 20px; font-weight: 700; font-family: var(--mono); letter-spacing: -0.04em; }
+.val.c-red { color: var(--red); }
+.val.c-green { color: var(--green); }
+.val.c-blue { color: var(--blue); }
+.val.c-amber { color: var(--amber); }
+
+.sid-section { margin-bottom: 1.2rem; }
+.sid-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+
+.search-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 7px 10px; color: var(--text);
+  font-size: 12px; font-family: var(--mono); transition: border 0.15s; margin-bottom: 0.8rem;
+}
+.search-input:focus { outline: none; border-color: var(--teal); }
+.search-input::placeholder { color: var(--text3); }
+
+.filter-list { display: flex; flex-direction: column; gap: 2px; }
+.flt { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s; font-size: 12px; color: var(--text2); border: 1px solid transparent; }
+.flt:hover { background: var(--bg3); color: var(--text); }
+.flt.active { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.flt.active .flt-dot { opacity: 1; }
+.flt-name { display: flex; align-items: center; gap: 6px; }
+.flt-dot { width: 7px; height: 7px; border-radius: 50%; opacity: 0.4; transition: opacity 0.15s; }
+.flt-cnt { font-size: 10px; font-family: var(--mono); color: var(--text3); }
+
+.repute-filter { display: flex; flex-direction: column; gap: 4px; }
+.rep-btn { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text2); background: transparent; border: 1px solid transparent; font-family: var(--sans); transition: all 0.15s; text-align: left; width: 100%; }
+.rep-btn:hover { background: var(--bg3); }
+.rep-btn.active-bad { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+.rep-btn.active-good { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.rep-btn.active-gray { background: var(--gray-bg); border-color: var(--gray-border); color: var(--gray-repute); }
+.rep-btn.active-all { background: var(--bg3); border-color: var(--border2); color: var(--text); }
+.rep-swatch { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.rep-swatch.bad { background: var(--red); }
+.rep-swatch.good { background: var(--green); }
+.rep-swatch.gray { background: var(--gray-repute); }
+.rep-swatch.all { background: linear-gradient(135deg, var(--red) 0%, var(--red) 33%, var(--gray-repute) 33%, var(--gray-repute) 66%, var(--green) 66%); }
+
+/* ── MAIN CONTENT ── */
+.main-content { padding: 1.2rem 1.5rem; overflow-x: hidden; }
+
+.results-bar {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.results-info { font-size: 12px; color: var(--text2); }
+.results-info strong { color: var(--text); }
+
+.view-toggle { display: flex; gap: 4px; margin-left: auto; }
+.view-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 5px; padding: 5px 9px; cursor: pointer; font-size: 11px; color: var(--text2); font-family: var(--sans); transition: all 0.15s; }
+.view-btn.active { background: var(--bg4); color: var(--text); border-color: var(--border2); }
+
+.sort-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; font-size: 11px; color: var(--text2); }
+.sort-opt { padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; transition: all 0.1s; }
+.sort-opt:hover { background: var(--bg3); color: var(--text); }
+.sort-opt.active { background: var(--bg3); border-color: var(--border2); color: var(--text); }
+
+/* ── CARD GRID ── */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px; }
+
+.snp-card {
+  background: var(--bg2); border-radius: var(--card-radius);
+  border-left: 3px solid var(--gray-repute);
+  border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 0; overflow: hidden; transition: box-shadow 0.15s;
+  display: flex; flex-direction: column;
+}
+.snp-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.snp-card.repute-bad { border-left-color: var(--red); }
+.snp-card.repute-good { border-left-color: var(--green); }
+.snp-card.repute-gray { border-left-color: var(--gray-repute); }
+.snp-card.not-in-file { opacity: 0.5; }
+
+.card-header { padding: 10px 12px 8px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--border); }
+.card-rsid-block { flex: 1; min-width: 0; }
+.card-rsid {
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--blue);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+}
+.card-rsid:hover { color: var(--teal); }
+.card-rsid-link { font-size: 9px; opacity: 0.5; }
+.card-gene { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: var(--mono); }
+
+.card-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+.mag-badge {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; font-family: var(--mono); color: var(--text2);
+}
+.mag-dots { display: flex; gap: 2px; }
+.mag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bg4); }
+.mag-dot.filled { background: var(--amber); }
+
+.genotype-display {
+  font-family: var(--mono); font-size: 16px; font-weight: 700;
+  padding: 3px 10px; border-radius: 5px; background: var(--bg3);
+  color: var(--text3); border: 1px solid var(--border);
+}
+.genotype-display.risk-gt { color: var(--red); background: var(--red-bg); border-color: var(--red-border); }
+.genotype-display.good-gt { color: var(--green); background: var(--green-bg); border-color: var(--green-border); }
+.genotype-display.na-gt { color: var(--text3); }
+
+.card-body { padding: 10px 12px; flex: 1; }
+
+.repute-row { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+.repute-pill {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 3px; text-transform: uppercase;
+}
+.repute-pill.bad { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.repute-pill.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.repute-pill.gray { background: var(--gray-bg); color: var(--gray-repute); border: 1px solid var(--gray-border); }
+.repute-pill.notfound { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+
+.cat-pill {
+  font-size: 10px; padding: 2px 7px; border-radius: 3px;
+}
+.cat-obesity { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+.cat-lipids { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+.cat-omega { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+.cat-diabetes { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+.cat-liver { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+.cat-hypertension { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+.cat-inflammation { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+.cat-detox { background: rgba(20,184,166,0.12); color: #14b8a6; border: 1px solid rgba(20,184,166,0.25); }
+.cat-vitamins { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+.cat-gut { background: rgba(217,70,239,0.12); color: #d946ef; border: 1px solid rgba(217,70,239,0.25); }
+.cat-circadian { background: rgba(139,92,246,0.12); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.25); }
+.cat-hormones { background: rgba(244,114,182,0.12); color: #f472b6; border: 1px solid rgba(244,114,182,0.25); }
+.cat-neuro { background: rgba(99,102,241,0.12); color: #6366f1; border: 1px solid rgba(99,102,241,0.25); }
+.cat-sport { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+.cat-cardio { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+.cat-skin { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+.cat-energy { background: rgba(234,179,8,0.12); color: #eab308; border: 1px solid rgba(234,179,8,0.25); }
+
+.snp-summary { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; }
+.snp-summary strong { color: var(--text); font-weight: 600; }
+
+.risk-allele-row { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.risk-allele-row span { font-family: var(--mono); color: var(--text2); }
+
+.sources-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.source-badge {
+  font-size: 10px; font-family: var(--mono); padding: 2px 7px;
+  border-radius: 3px; text-decoration: none; transition: opacity 0.15s;
+}
+.source-badge:hover { opacity: 0.7; }
+.src-snpedia { background: rgba(91,156,246,0.15); color: var(--blue); border: 1px solid rgba(91,156,246,0.3); }
+.src-clinvar { background: rgba(48,204,168,0.12); color: var(--teal); border: 1px solid rgba(48,204,168,0.25); }
+.src-omim { background: rgba(240,160,48,0.12); color: var(--amber); border: 1px solid rgba(240,160,48,0.25); }
+.src-gwas { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+
+.clinvar-sig { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.clinvar-sig.pathogenic { color: var(--red); }
+.clinvar-sig.likely_pathogenic { color: #e87a3a; }
+.clinvar-sig.benign { color: var(--green); }
+.clinvar-sig.vus { color: var(--amber); }
+
+/* ── TABLE VIEW ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 7px 10px; color: var(--text2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; border-bottom: 1px solid var(--border2); white-space: nowrap; cursor: pointer; }
+th:hover { color: var(--text); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:hover td { background: var(--bg3); }
+tr.not-in-file td { opacity: 0.4; }
+
+/* ── LOADING ── */
+.loading-overlay { display: none; position: fixed; inset: 0; background: rgba(15,17,23,0.9); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+.loading-overlay.show { display: flex; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--bg4); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+
+.no-results { text-align: center; padding: 3rem; color: var(--text3); font-size: 13px; }
+.reset-btn { background: transparent; border: 1px solid var(--border2); color: var(--text2); border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 11px; font-family: var(--sans); transition: all 0.15s; }
+.reset-btn:hover { color: var(--text); border-color: var(--text3); }
+.footer { padding: 1rem 1.5rem; font-size: 10px; color: var(--text3); text-align: center; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Parsing file…</div>
+</div>
+
+<header class="header">
+  <div class="logo">🧬 gen<span>hack</span></div>
+  <div class="header-badges">
+    <span class="hbadge" id="db-badge">215 SNPs</span>
+    <span class="hbadge">Nutrigenetic Panel</span>
+  </div>
+  <div class="header-right">
+    <span class="file-chip" id="file-chip" style="display:none"></span>
+    <button class="reset-btn" onclick="resetApp()" style="display:none" id="reset-btn">↩ New file</button>
+  </div>
+</header>
+
+<!-- ── UPLOAD ── -->
+<div id="upload-section">
+  <div class="upload-section" style="max-width:680px;margin:5rem auto;padding:0 2rem;">
+    <div class="upload-hero">
+      <h1>gen<span style="color:var(--teal)">hack</span></h1>
+      <p>Analyze your raw DNA against <strong id="snp-count-hero">215</strong> clinically-annotated SNPs — Promethease-style, in your browser.</p>
+    </div>
+    <div class="upload-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".txt,.csv,.tsv,.zip">
+      <span class="upload-icon">📂</span>
+      <h2>Drop your raw DNA file here</h2>
+      <p>Or click to browse · Your data never leaves this browser</p>
+      <div class="chips">
+        <span class="chip">23andMe</span><span class="chip">Ancestry</span>
+        <span class="chip">Genera</span><span class="chip">MyHeritage</span>
+        <span class="chip">.txt .tsv .csv</span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="demo-btn" onclick="loadDemo()">Try with demo data →</button>
+    </div>
+    <p class="privacy-note">🔒 100% local processing — no uploads, no server, no tracking.</p>
+  </div>
+</div>
+
+<!-- ── RESULTS ── -->
+<div id="results-section">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sid-section">
+        <div class="stat-grid">
+          <div class="stat-box"><div class="lbl">Total SNPs</div><div class="val c-blue" id="s-total">—</div></div>
+          <div class="stat-box"><div class="lbl">Found</div><div class="val c-green" id="s-found">—</div></div>
+          <div class="stat-box"><div class="lbl">Risk vars</div><div class="val c-red" id="s-risk">—</div></div>
+          <div class="stat-box"><div class="lbl">Neutral</div><div class="val c-green" id="s-neu">—</div></div>
+        </div>
+      </div>
+
+      <div class="sid-section">
+        <div class="sid-label">Search</div>
+        <input class="search-input" type="text" id="search-box" placeholder="gene · rsid · keyword…" oninput="applyFilters()">
+      </div>
+
+      <div class="sid-section">
+        <div class="sid-label">Repute</div>
+        <div class="repute-filter">
+          <button class="rep-btn active-all" onclick="setRepute('all',this)"><span class="rep-swatch all"></span>All results</button>
+          <button class="rep-btn" onclick="setRepute('bad',this)"><span class="rep-swatch bad"></span>Bad (risk variant present)</button>
+          <button class="rep-btn" onclick="setRepute('good',this)"><span class="rep-swatch good"></span>Good (protective)</button>
+          <button class="rep-btn" onclick="setRepute('gray',this)"><span class="rep-swatch gray"></span>Gray (neutral/unknown)</button>
+        </div>
+      </div>
+
+      <div class="sid-section">
+        <div class="sid-label">Category</div>
+        <div class="filter-list" id="cat-list"></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <div class="results-bar">
+        <div class="results-info"><strong id="r-count">—</strong> variants shown</div>
+        <div class="sort-bar">
+          Sort:
+          <span class="sort-opt active" onclick="setSort('magnitude',this)">Magnitude</span>
+          <span class="sort-opt" onclick="setSort('gene',this)">Gene</span>
+          <span class="sort-opt" onclick="setSort('status',this)">Status</span>
+          <span class="sort-opt" onclick="setSort('category',this)">Category</span>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="setView('cards',this)">Cards</button>
+          <button class="view-btn" onclick="setView('table',this)">Table</button>
+        </div>
+      </div>
+
+      <div id="cards-view"><div class="cards-grid" id="cards-grid"></div></div>
+      <div id="table-view" style="display:none">
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>Gene</th><th>rsID</th><th>Your Genotype</th><th>Repute</th>
+            <th>Magnitude</th><th>Category</th><th>ClinVar</th><th>Summary</th>
+          </tr></thead><tbody id="table-body"></tbody></table>
+        </div>
+      </div>
+      <div class="no-results" id="no-results" style="display:none">No variants match your filters.</div>
+      <div class="footer" id="footer-txt"></div>
+    </main>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// SNP KNOWLEDGE BASE — clinical descriptions + magnitude
+// ════════════════════════════════════════════════════════════
+const SNPINFO = {
+  // OBESITY
+  rs9939609:  {mag:4,summary:"The <strong>FTO</strong> rs9939609 A allele is one of the most replicated obesity loci, associated with ~1.67× increased risk of obesity and ~3 kg greater body weight on average. The AT genotype confers intermediate risk. FTO normally suppresses ghrelin transcription; risk variants impair satiety signaling. Validated in hundreds of GWAS studies across diverse populations.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs8050136:  {mag:3,summary:"Second major <strong>FTO</strong> obesity variant, in high LD with rs9939609. The A allele associates with elevated BMI, increased adiposity, and altered appetite regulation through the same IRX3/5 regulatory pathway. Replicated in European, Asian, and African cohorts.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1801133:  {mag:5,summary:"<strong>MTHFR C677T</strong> — one of the most clinically studied variants. The TT (AA in forward strand) genotype reduces MTHFR enzyme activity by ~70%, the CT genotype by ~35%. Leads to elevated plasma homocysteine, impaired folate metabolism, and reduced methylation capacity. Associated with increased cardiovascular risk, neural tube defect risk, and may affect mood via neurotransmitter synthesis.",clinvar:"Pathogenic/Likely pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs1801131:  {mag:3,summary:"<strong>MTHFR A1298C</strong> — secondary MTHFR variant. GG genotype reduces enzyme activity moderately. When compound heterozygous with C677T, the effect on homocysteine elevation is amplified significantly. Associated with folate-related conditions.",clinvar:"Likely pathogenic",sources:["snpedia","clinvar"]},
+  rs4680:     {mag:4,summary:"<strong>COMT Val158Met</strong> — the Met/Met (AA) genotype reduces COMT enzyme activity 3–4×, elevating dopamine in the prefrontal cortex. Met/Met is associated with enhanced working memory and pain sensitivity, but greater susceptibility to stress-induced psychosis. Val/Val degrades dopamine faster, associated with resilience under stress but lower baseline cognitive performance.",clinvar:"",sources:["snpedia","omim"]},
+  rs7903146:  {mag:4,summary:"<strong>TCF7L2</strong> — strongest common genetic risk factor for type 2 diabetes. The T allele (risk) impairs insulin secretion by affecting Wnt signaling in pancreatic β-cells. TT individuals have ~2× T2D risk vs CC. Large-scale meta-analyses confirm association across all ethnicities. Effect is diet-modifiable.",clinvar:"Risk factor",sources:["snpedia","gwas","clinvar"]},
+  rs6025:     {mag:7,summary:"<strong>Factor V Leiden</strong> — the T allele causes a R506Q substitution in coagulation Factor V, making it resistant to inactivation by activated protein C. Heterozygotes (CT) have 5–10× increased risk of venous thromboembolism; homozygotes (TT) have 50–100× risk. Most common inherited thrombophilia in Europeans (~5%). Pregnancy, oral contraceptives, and immobilization amplify risk.",clinvar:"Pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs1799963:  {mag:6,summary:"<strong>Prothrombin G20210A (F2)</strong> — the A allele results in ~30% elevated prothrombin (Factor II) levels in plasma. GA/AA individuals have ~3–5× increased risk of venous thrombosis. Second most common hereditary thrombophilia after Factor V Leiden. Risk compounds when co-inherited with Factor V Leiden.",clinvar:"Pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs429358:   {mag:6,summary:"<strong>APOE ε4 allele</strong> — defined by rs429358-C. The ε4 haplotype is the strongest genetic risk factor for late-onset Alzheimer's disease (LOAD). One copy increases AD risk ~3×; two copies ~12×. APOE ε4 also associates with higher LDL cholesterol and cardiovascular risk. Affects lipid transport and amyloid clearance.",clinvar:"Risk factor",sources:["snpedia","clinvar","gwas"]},
+  rs7412:     {mag:5,summary:"<strong>APOE ε2 allele</strong> — defined by rs7412-T. The ε2 haplotype is protective against Alzheimer's disease but associated with dysbetalipoproteinemia (type III hyperlipidemia) risk when homozygous. Part of the APOE haplotype trio (ε2/ε3/ε4) critical for lipid metabolism characterization.",clinvar:"Risk factor",sources:["snpedia","clinvar"]},
+  rs1800629:  {mag:3,summary:"<strong>TNF-α -308 G>A</strong> — the A allele increases TNF-α transcription and is associated with elevated systemic inflammation, higher susceptibility to sepsis, rheumatoid arthritis, and inflammatory bowel disease. Also associated with fatty liver disease progression in obese individuals.",clinvar:"",sources:["snpedia","gwas"]},
+  rs738409:   {mag:4,summary:"<strong>PNPLA3 I148M</strong> — the GG genotype (Ile148Met substitution) is the strongest genetic determinant of hepatic fat accumulation. GG individuals have ~5× risk of non-alcoholic fatty liver disease (NAFLD) and accelerated progression to cirrhosis. Enzyme activity on triglycerides in hepatocytes is severely impaired.",clinvar:"Risk factor",sources:["snpedia","clinvar","gwas"]},
+  rs1042713:  {mag:2,summary:"<strong>ADRB2 Arg16Gly</strong> — the A allele (Arg16) associates with reduced receptor downregulation in response to agonist stimulation, affecting bronchodilation and thermogenesis. Combined genotype analysis with rs1042714 gives more complete metabolic risk picture.",clinvar:"",sources:["snpedia"]},
+  rs5443:     {mag:3,summary:"<strong>GNB3 C825T</strong> — the T allele creates a splice variant that enhances G-protein signaling efficiency. Associated with essential hypertension, obesity (especially in certain ethnic groups), and enhanced antidepressant response. The TT genotype is more common in individuals of African descent.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1799883:  {mag:2,summary:"<strong>FABP2 Ala54Thr</strong> — the Thr54 (T allele) variant binds long-chain fatty acids with ~2× greater affinity than Ala54. Associated with increased intestinal fat absorption, higher postprandial triglycerides, and insulin resistance in response to high-fat diets.",clinvar:"",sources:["snpedia"]},
+  rs7799039:  {mag:3,summary:"<strong>LEP -2548 G>A</strong> — variant in the leptin gene promoter. The AA genotype is associated with lower leptin levels in some studies, affecting hunger regulation and energy balance. Leptin is the primary adiposity signal to the hypothalamus.",clinvar:"",sources:["snpedia"]},
+  rs17782313: {mag:3,summary:"<strong>MC4R</strong> — the C allele is associated with increased BMI, altered fat distribution, and greater food intake. MC4R is critical for melanocortin-mediated appetite suppression in the hypothalamus. This locus is robustly associated with obesity across multiple GWAS.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs1801282:  {mag:3,summary:"<strong>PPARG Pro12Ala</strong> — the Ala (G) allele is actually <em>protective</em> against type 2 diabetes by improving insulin sensitivity, but the common Pro/Pro (CC) is less protective. The G allele associates with lower BMI and better adipogenesis regulation.",clinvar:"",sources:["snpedia","gwas"]},
+  rs659366:   {mag:2,summary:"<strong>UCP2</strong> — variant in the uncoupling protein 2 promoter. The T allele associates with reduced UCP2 expression, lower thermogenesis, and potentially higher fat storage. UCP2 is involved in proton leak across the inner mitochondrial membrane.",clinvar:"",sources:["snpedia"]},
+  rs5082:     {mag:2,summary:"<strong>APOA2 -265T>C</strong> — the GG (CC) genotype associates with higher saturated fat absorption and increased BMI specifically in individuals with high saturated fat intake. Demonstrates gene-diet interaction for cardiovascular risk.",clinvar:"",sources:["snpedia","gwas"]},
+  // LIPIDS
+  rs662799:   {mag:3,summary:"<strong>APOA5 -1131T>C</strong> — the G allele is strongly associated with elevated triglyceride levels (~20-30% higher in carriers). APOA5 stimulates lipoprotein lipase activity; the promoter variant reduces APOA5 expression. Associated with hypertriglyceridemia and metabolic syndrome.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs5742904:  {mag:5,summary:"<strong>APOB R3500Q</strong> — the T allele causes familial defective apolipoprotein B-100 (FDB), impairing LDL receptor binding. Leads to elevated LDL-cholesterol and significantly increased cardiovascular risk. Autosomal dominant condition.",clinvar:"Pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs3846662:  {mag:3,summary:"<strong>HMGCR</strong> — intronic variant affecting mRNA splicing of HMG-CoA reductase, the rate-limiting enzyme of cholesterol synthesis and the target of statins. The GG genotype associates with higher baseline LDL and may predict variable statin response.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1800562:  {mag:6,summary:"<strong>HFE C282Y</strong> — pathogenic variant for hereditary hemochromatosis. The GG (Tyr/Tyr) homozygous state results in marked iron overload affecting liver, heart, pancreas, and joints. Heterozygotes typically have modestly elevated iron stores. Most common Mendelian disorder in northern Europeans (~1 in 300).",clinvar:"Pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs1799945:  {mag:4,summary:"<strong>HFE H63D</strong> — compound heterozygosity with C282Y (rs1800562) is the second most common cause of hereditary hemochromatosis. H63D alone rarely causes clinical iron overload but may contribute to elevated iron indices and oxidative stress.",clinvar:"Likely pathogenic",sources:["snpedia","clinvar","omim"]},
+  rs708272:   {mag:2,summary:"<strong>CETP TaqIB B1/B2</strong> — the B2 allele (GG) associates with lower CETP activity, leading to higher HDL-cholesterol levels. Higher HDL is generally cardioprotective. The B1B1 (CC) genotype has highest CETP activity and lowest HDL.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1800588:  {mag:2,summary:"<strong>LIPC -514C>T</strong> — the CC genotype associates with higher hepatic lipase activity, lower HDL-cholesterol, and a more atherogenic lipid profile. Interacts with dietary fat intake to affect HDL levels.",clinvar:"",sources:["snpedia"]},
+  rs11206510: {mag:3,summary:"<strong>PCSK9</strong> — this variant modulates PCSK9 expression, affecting LDL receptor recycling. Risk alleles associate with higher LDL-C. PCSK9 is the target of a class of powerful cholesterol-lowering biologics (e.g., evolocumab, alirocumab).",clinvar:"",sources:["snpedia","gwas"]},
+  rs854560:   {mag:2,summary:"<strong>PON1 L55M</strong> — the T allele (Met55) associates with reduced paraoxonase activity and lower antioxidant capacity on HDL particles, potentially contributing to increased LDL oxidation and cardiovascular risk.",clinvar:"",sources:["snpedia"]},
+  rs662:      {mag:3,summary:"<strong>PON1 Q192R</strong> — the R allele (CC) has higher PON1 enzymatic activity toward certain substrates but may differ in protection against LDL oxidation. Associated with variable cardiovascular risk and organophosphate susceptibility.",clinvar:"",sources:["snpedia"]},
+  // OMEGA
+  rs174546:   {mag:3,summary:"<strong>FADS1</strong> — the T allele reduces FADS1 (delta-5 desaturase) activity, impairing conversion of ALA to EPA/DHA. Individuals with this variant benefit more from direct omega-3 supplementation (EPA/DHA) rather than ALA-rich foods (flaxseed, chia).",clinvar:"",sources:["snpedia","gwas"]},
+  rs174616:   {mag:2,summary:"<strong>FADS2</strong> — the A allele reduces FADS2 (delta-6 desaturase) activity, the first step in omega-3/6 elongation pathway. Associated with altered polyunsaturated fatty acid profiles in plasma and red blood cells.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1799983:  {mag:3,summary:"<strong>eNOS Glu298Asp (NOS3)</strong> — the T allele (Asp298) reduces eNOS enzyme efficiency and bioavailable nitric oxide. Associated with endothelial dysfunction, hypertension, and increased coronary artery disease risk. Omega-3 supplementation may partially compensate through eNOS-independent pathways.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs953413:   {mag:2,summary:"<strong>ELOVL2</strong> — variant affecting PUFA elongation efficiency. The A allele reduces long-chain PUFA synthesis and is also one of the most reliable epigenetic aging clocks. Associates with DHA levels in plasma.",clinvar:"",sources:["snpedia","gwas"]},
+  // DIABETES
+  rs10830963: {mag:4,summary:"<strong>MTNR1B</strong> — the G allele impairs the fasting glucose response via melatonin receptor signaling in pancreatic β-cells. CG/GG genotypes associate with higher fasting glucose, impaired early insulin secretion, and increased type 2 diabetes risk (~25% per G allele). Light exposure timing and melatonin supplementation may interact with this variant.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs5219:     {mag:3,summary:"<strong>KCNJ11 E23K</strong> — the T (Lys23) allele reduces ATP sensitivity of the KATP channel in β-cells, impairing insulin secretion in response to glucose. Associated with increased T2D risk and may predict differential response to sulfonylurea drugs.",clinvar:"Risk factor",sources:["snpedia","gwas","clinvar"]},
+  rs13266634: {mag:3,summary:"<strong>SLC30A8 R325W</strong> — the C (Trp325) allele reduces zinc transporter activity in pancreatic β-cells. Interestingly, loss-of-function variants in SLC30A8 are protective against T2D, suggesting complex dose-response. Common risk allele associated with modest T2D risk increase.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs4402960:  {mag:2,summary:"<strong>IGF2BP2</strong> — intronic variant robustly associated with T2D risk in GWAS. The T allele associates with modestly impaired β-cell function. The exact mechanism involves insulin mRNA regulation.",clinvar:"",sources:["snpedia","gwas"]},
+  rs2943641:  {mag:2,summary:"<strong>IRS1</strong> — variant near the insulin receptor substrate 1 gene. The T allele associates with reduced insulin signaling efficiency, increased insulin resistance, and T2D risk. Diet and exercise may significantly modulate the genetic effect.",clinvar:"",sources:["snpedia","gwas"]},
+  // LIVER
+  rs7946:     {mag:3,summary:"<strong>PEMT</strong> — the T allele reduces phosphatidylcholine synthesis from phosphatidylethanolamine in the liver. Inadequate PC production impairs VLDL assembly and export, promoting hepatic fat accumulation (steatosis), especially on low-choline diets. Choline requirements are higher in T allele carriers.",clinvar:"",sources:["snpedia"]},
+  rs1495741:  {mag:2,summary:"<strong>NAT2</strong> — slow acetylator phenotype variant. The A allele is associated with slow NAT2 activity, leading to reduced detoxification of certain xenobiotics, aromatic amines, and drugs (e.g., isoniazid, hydralazine). Slow acetylators may accumulate drug metabolites and have altered cancer susceptibility.",clinvar:"",sources:["snpedia","omim"]},
+  rs361525:   {mag:2,summary:"<strong>TNF-α -238 G>A</strong> — the A allele is associated with increased TNF-α promoter activity and elevated inflammatory cytokine production. Less studied than the -308 variant (rs1800629) but may contribute to inflammatory conditions.",clinvar:"",sources:["snpedia"]},
+  // HYPERTENSION
+  rs4343:     {mag:3,summary:"<strong>ACE I/D polymorphism (rs4343)</strong> — the G allele (D allele) associates with higher circulating ACE enzyme levels and increased angiotensin II production. DD genotype associates with hypertension, left ventricular hypertrophy, and higher cardiovascular risk. Also predicts differential response to ACE inhibitors.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs699:      {mag:3,summary:"<strong>AGT M235T</strong> — the G allele (Thr235) associates with higher angiotensinogen levels and essential hypertension. Also studied in the context of athletic performance — the T allele may associate with endurance performance advantages through altered vascular function.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs5186:     {mag:3,summary:"<strong>AGTR1 A1166C</strong> — the C allele of the AT1 receptor gene is associated with increased receptor expression and vascular sensitivity to angiotensin II, contributing to essential hypertension, left ventricular hypertrophy, and preeclampsia risk.",clinvar:"Risk factor",sources:["snpedia"]},
+  rs671:      {mag:4,summary:"<strong>ALDH2*2</strong> — the A allele (Glu504Lys) dramatically reduces ALDH2 enzyme activity, causing acetaldehyde accumulation after alcohol consumption ('Asian flush'). Also associated with increased cardiovascular risk and esophageal cancer risk in alcohol consumers. Most common in East Asian populations.",clinvar:"Risk factor",sources:["snpedia","clinvar","omim"]},
+  // INFLAMMATION
+  rs1800795:  {mag:3,summary:"<strong>IL-6 -174 G>C</strong> — the GG genotype is associated with higher IL-6 transcription and systemic inflammation. Elevated IL-6 contributes to acute-phase response, insulin resistance, depression, and cardiovascular disease. The C allele reduces IL-6 promoter activity.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs1143643:  {mag:2,summary:"<strong>IL-1β</strong> — variant in the interleukin-1 beta gene region associated with altered innate immune response and inflammatory potential. IL-1β is a key mediator of fever, acute-phase reaction, and inflammasome activation.",clinvar:"",sources:["snpedia"]},
+  rs2066845:  {mag:3,summary:"<strong>NOD2 G908R</strong> — the C allele (Arg908) is associated with impaired bacterial peptidoglycan recognition, increasing susceptibility to Crohn's disease. This is one of three major NOD2 variants that together explain ~20% of the genetic risk for Crohn's disease.",clinvar:"Risk factor",sources:["snpedia","clinvar","omim"]},
+  // DETOX
+  rs1695:     {mag:3,summary:"<strong>GSTP1 Ile105Val</strong> — the G (Val105) allele reduces GSTP1 enzyme activity toward many carcinogens and electrophilic compounds. Associated with increased cancer risk in several studies, particularly bladder and lung cancer in smokers, and altered drug metabolism.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs1800566:  {mag:3,summary:"<strong>NQO1 Pro187Ser</strong> — the A allele (Ser187) nearly abolishes NQO1 enzyme activity (null allele). NQO1 protects against oxidative stress, regenerates CoQ10, and detoxifies quinones. AA individuals have markedly increased sensitivity to certain chemotherapy agents and higher oxidative stress.",clinvar:"Risk factor",sources:["snpedia","clinvar"]},
+  rs4880:     {mag:3,summary:"<strong>SOD2 Val16Ala</strong> — the GG (Val/Val) genotype results in less efficient mitochondrial import of SOD2, reducing mitochondrial antioxidant capacity. Associated with increased oxidative stress, altered cancer risk, and may affect mitochondrial function.",clinvar:"",sources:["snpedia","gwas"]},
+  rs6721961:  {mag:3,summary:"<strong>NRF2 promoter</strong> — the TT genotype reduces NRF2 transcriptional activity. NRF2 is the master regulator of the antioxidant response element (ARE), controlling expression of hundreds of cytoprotective genes. Reduced activity associated with higher oxidative stress and increased cancer susceptibility.",clinvar:"",sources:["snpedia"]},
+  rs25487:    {mag:2,summary:"<strong>XRCC1 Arg399Gln</strong> — the T (Gln399) allele reduces DNA base-excision repair efficiency. Associated with increased DNA damage accumulation, higher cancer susceptibility, and sensitivity to radiation and alkylating agents.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs1050450:  {mag:2,summary:"<strong>GPX1 Pro198Leu</strong> — the A (Leu198) allele reduces glutathione peroxidase 1 activity, a key cytoplasmic antioxidant enzyme. Associated with increased cancer risk and reduced protection against oxidative stress.",clinvar:"Risk factor",sources:["snpedia"]},
+  // VITAMINS D
+  rs10877012: {mag:2,summary:"<strong>CYP27B1</strong> — variant affecting 1α-hydroxylase activity, the enzyme that converts 25(OH)D to the active form 1,25(OH)₂D (calcitriol) in the kidney. The risk allele associates with impaired vitamin D activation and higher supplementation requirements.",clinvar:"",sources:["snpedia","gwas"]},
+  rs2282679:  {mag:3,summary:"<strong>GC (vitamin D-binding protein)</strong> — the T allele is associated with lower circulating 25(OH)D levels through reduced vitamin D transport capacity in blood. One of the most replicated variants for vitamin D status. Higher-dose vitamin D supplementation may be needed to achieve optimal serum levels.",clinvar:"",sources:["snpedia","gwas"]},
+  rs2228570:  {mag:2,summary:"<strong>VDR FokI</strong> — the A allele (ff genotype) produces a slightly longer VDR protein with reduced transactivation efficiency. Associated with altered vitamin D receptor signaling, potentially affecting bone density, immune function, and cancer risk.",clinvar:"",sources:["snpedia","gwas"]},
+  rs731236:   {mag:2,summary:"<strong>VDR TaqI</strong> — 3' UTR variant in the vitamin D receptor gene affecting mRNA stability and VDR expression. Associated with bone mineral density, T2D risk, and immune function. GG (tt) genotype associated with potentially lower VDR expression.",clinvar:"",sources:["snpedia","gwas"]},
+  // FOLATE
+  rs1805087:  {mag:3,summary:"<strong>MTR A2756G</strong> — the AA (Asp919) genotype reduces methionine synthase activity, impairing homocysteine remethylation to methionine. Results in elevated plasma homocysteine. Functionally interacts with MTHFR variants; combined defects significantly impair the methylation cycle.",clinvar:"",sources:["snpedia"]},
+  rs1801394:  {mag:3,summary:"<strong>MTRR A66G</strong> — the GG genotype reduces methionine synthase reductase activity, which is required to maintain methionine synthase (MTR) in its active form. Leads to impaired vitamin B12 utilization and elevated homocysteine. Particularly important when combined with MTR and MTHFR variants.",clinvar:"",sources:["snpedia","clinvar"]},
+  rs234706:   {mag:2,summary:"<strong>CBS 844ins68</strong> — variant in cystathionine beta-synthase, which converts homocysteine to cystathionine. The GG (risk) genotype may reduce CBS activity, impairing the transsulfuration pathway and elevating homocysteine.",clinvar:"",sources:["snpedia"]},
+  rs602662:   {mag:2,summary:"<strong>FUT2</strong> — the GG (non-secretor) genotype is associated with lower vitamin B12 absorption via reduced expression of specific intestinal receptors. Non-secretors have on average lower serum B12 and may require higher dietary intake or supplementation.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1801198:  {mag:2,summary:"<strong>TCN2 776C>G</strong> — the GG genotype reduces transcobalamin II binding affinity for vitamin B12, impairing cellular B12 delivery. Despite normal serum B12, functional deficiency may occur at the cellular level.",clinvar:"",sources:["snpedia"]},
+  // VIT A
+  rs7501331:  {mag:2,summary:"<strong>BCMO1 R267S</strong> — the T allele reduces β-carotene conversion to retinol (vitamin A) by ~50-70%. Individuals with TT genotype may be at risk of vitamin A insufficiency on plant-based diets that rely on provitamin A carotenoids.",clinvar:"",sources:["snpedia"]},
+  rs12934922: {mag:2,summary:"<strong>BCMO1 A379V</strong> — second major BCMO1 variant. The T allele further reduces carotenoid conversion efficiency. When combined with rs7501331, conversion may be reduced by >80%. Direct preformed vitamin A (retinol) from animal sources or supplementation is especially important.",clinvar:"",sources:["snpedia"]},
+  // GUT
+  rs4988235:  {mag:4,summary:"<strong>LCT -13910C>T (MCM6)</strong> — determines adult lactase persistence. The GG (CC in some notations) genotype is associated with lactase non-persistence (lactose intolerance). Adults with this genotype downregulate lactase after childhood. Prevalence varies dramatically by ancestry: ~90% in Southeast Asia, ~5% in Northern Europe.",clinvar:"Risk factor",sources:["snpedia","clinvar","omim"]},
+  rs2187668:  {mag:4,summary:"<strong>HLA-DQ2.5 (DQA1*05/DQB1*02)</strong> — the T allele tags the HLA-DQ2.5 haplotype, present in ~90% of celiac disease patients. The T allele alone is necessary but not sufficient for celiac disease; environmental gluten exposure and other factors are required. Negative result largely rules out celiac disease.",clinvar:"Risk factor",sources:["snpedia","clinvar","omim"]},
+  rs2395182:  {mag:3,summary:"<strong>HLA-DQ2/DQ8 region</strong> — part of the celiac disease HLA susceptibility haplotype system. Used in combination with other HLA markers to determine DQ2 and DQ8 haplotype status. Essential for celiac disease genetic risk assessment.",clinvar:"Risk factor",sources:["snpedia","clinvar"]},
+  // CIRCADIAN
+  rs1801260:  {mag:2,summary:"<strong>CLOCK 3111T>C</strong> — the G (C) allele is associated with evening chronotype, delayed sleep phase, and higher ADHD and bipolar disorder risk. CLOCK is the primary transcription factor of the circadian clock machinery.",clinvar:"",sources:["snpedia"]},
+  rs2287161:  {mag:2,summary:"<strong>CRY1</strong> — variant in the cryptochrome 1 gene, a key negative regulator of circadian CLOCK/BMAL1 transcriptional activity. The CC genotype associates with delayed circadian period and evening preference.",clinvar:"",sources:["snpedia","gwas"]},
+  // SPORT
+  rs1815739:  {mag:4,summary:"<strong>ACTN3 R577X</strong> — the CC (XX) genotype completely abolishes α-actinin-3 protein expression in fast-twitch muscle fibers. XX individuals show reduced sprint/power performance on average but preserved or enhanced endurance capacity. The C allele (X) is extremely common and was once termed a 'sports gene' variant. R577X is found in ~18% of individuals (homozygous XX).",clinvar:"",sources:["snpedia","gwas"]},
+  rs4253778:  {mag:2,summary:"<strong>PPARA intron 7</strong> — the C allele associates with reduced PPARA expression and blunted fatty acid oxidation response to training. G allele carriers show enhanced endurance adaptations. Associated with elite endurance athlete status.",clinvar:"",sources:["snpedia","gwas"]},
+  rs8192678:  {mag:3,summary:"<strong>PGC-1α Gly482Ser</strong> — the Ser482 (TT) genotype reduces PGC-1α transcriptional coactivator function, impairing mitochondrial biogenesis signaling. Associated with reduced VO₂max trainability, lower endurance performance, and higher T2D risk.",clinvar:"",sources:["snpedia","gwas"]},
+  rs1800012:  {mag:3,summary:"<strong>COL1A1 Sp1</strong> — the C allele reduces COL1A1 transcription, producing weaker type I collagen in tendons and bones. CC genotype is associated with increased ACL tear risk, stress fractures, and potentially reduced bone mineral density.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs12722:    {mag:3,summary:"<strong>COL5A1</strong> — 3'UTR variant affecting COL5A1 mRNA stability and type V collagen content. The TT genotype is associated with higher risk of ACL injury, Achilles tendinopathy, and endurance running injury. Collagen supplementation and eccentric training may be especially important.",clinvar:"",sources:["snpedia","gwas"]},
+  rs143383:   {mag:3,summary:"<strong>GDF5 5'UTR</strong> — the TT genotype reduces GDF5 expression. GDF5 (Growth Differentiation Factor 5) is critical for joint and cartilage development. TT associates with osteoarthritis risk, reduced intervertebral disc height, and joint health concerns.",clinvar:"Risk factor",sources:["snpedia","gwas","clinvar"]},
+  // CARDIO
+  rs3825807:  {mag:3,summary:"<strong>ADAMTS7</strong> — the A allele is associated with increased coronary artery disease risk via enhanced vascular smooth muscle cell migration and neointima formation. Identified as a CAD susceptibility locus in multiple large-scale GWAS.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs3184504:  {mag:3,summary:"<strong>SH2B3 (LNK) W262R</strong> — the T allele reduces LNK adapter protein function, leading to enhanced JAK2 signaling. Associated with increased platelet counts, erythrocytosis, coronary artery disease, and myeloproliferative neoplasm predisposition.",clinvar:"Risk factor",sources:["snpedia","gwas","clinvar"]},
+  rs6025_F5:  {mag:7,summary:"<strong>Factor V Leiden</strong> — see rs6025.",clinvar:"Pathogenic",sources:["clinvar"]},
+  rs5918:     {mag:3,summary:"<strong>ITGB3 HPA-1 (PLA2)</strong> — the C (Leu33) allele of platelet glycoprotein IIIa is associated with enhanced platelet aggregation and increased risk of coronary thrombosis, particularly in the context of rupture of vulnerable atherosclerotic plaques.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs1045642:  {mag:3,summary:"<strong>ABCB1 (MDR1) C3435T</strong> — the CC genotype is associated with higher P-glycoprotein expression, affecting bioavailability of numerous drugs including warfarin, digoxin, and many chemotherapy agents. Relevant for pharmacogenomic drug dosing.",clinvar:"",sources:["snpedia","omim"]},
+  rs2108622:  {mag:3,summary:"<strong>CYP4F2 V433M</strong> — the T (Met433) allele reduces CYP4F2 activity, impairing vitamin K₁ oxidation. Carriers have higher vitamin K levels and require higher warfarin doses to achieve therapeutic anticoagulation. Important for warfarin dose calculation algorithms (e.g., IWPC).",clinvar:"Risk factor",sources:["snpedia","clinvar","omim"]},
+  // SKIN
+  rs12913832: {mag:3,summary:"<strong>HERC2</strong> — major determinant of eye and skin color. The A allele strongly associates with blue eye color through regulation of OCA2 (melanocyte P protein). The C allele associates with brown eye color. Also affects UV-induced DNA damage susceptibility.",clinvar:"",sources:["snpedia","gwas"]},
+  rs11549465: {mag:2,summary:"<strong>HIF1A Pro582Ser</strong> — the C (Ser582) allele increases HIF-1α stability and activity under hypoxic conditions. Associated with altered vascular remodeling in adipose tissue and potentially higher risk of cellulite due to impaired angiogenesis.",clinvar:"",sources:["snpedia"]},
+  rs1159268:  {mag:2,summary:"<strong>TGFB2</strong> — variant in the TGF-β2 gene associated with enhanced keratinocyte proliferation. May contribute to acne severity and comedone formation through altered epidermal growth factor signaling.",clinvar:"",sources:["snpedia"]},
+  // HORMONES
+  rs2234693:  {mag:2,summary:"<strong>ESR1 PvuII</strong> — variant in the estrogen receptor alpha gene associated with differential response to estrogen signaling. Affects bone mineral density, cardiovascular risk, and breast cancer susceptibility in women.",clinvar:"Risk factor",sources:["snpedia","gwas"]},
+  rs11206244: {mag:2,summary:"<strong>DIO1</strong> — variant affecting type 1 iodothyronine deiodinase activity, which converts T4 to T3 in peripheral tissues. The T allele associates with altered T3:T4 ratio and may affect thyroid hormone efficacy.",clinvar:"",sources:["snpedia","gwas"]},
+  rs225014:   {mag:2,summary:"<strong>DIO2 Thr92Ala</strong> — the CC (Ala92) genotype reduces DIO2 enzyme efficiency in converting T4 to T3 locally in the brain and pituitary. Associated with impaired T4-to-T3 conversion, symptoms persisting despite normal TSH, and potentially poorer response to T4 monotherapy.",clinvar:"",sources:["snpedia","gwas"]},
+  // NEURO
+  rs686:      {mag:2,summary:"<strong>DRD1</strong> — variant near the dopamine receptor D1 gene associated with behavioral traits including ADHD susceptibility, reward sensitivity, and addiction risk.",clinvar:"",sources:["snpedia"]},
+  rs1800497:  {mag:3,summary:"<strong>DRD2/ANKK1 Taq1A</strong> — the AA (A1/A1) genotype is associated with ~30% lower D2 receptor density in the striatum. Linked to higher addiction risk (alcohol, nicotine, gambling), obesity, and ADHD. The A1 allele is also associated with blunted dopamine reward signaling.",clinvar:"",sources:["snpedia","gwas"]},
+  rs6311:     {mag:2,summary:"<strong>HTR2A -1438G>A</strong> — variant in the serotonin 2A receptor gene promoter. The CC allele associates with higher receptor expression and is linked to antidepressant response, obsessive-compulsive disorder, and eating disorder susceptibility.",clinvar:"",sources:["snpedia"]},
+  rs2254298:  {mag:2,summary:"<strong>OXTR</strong> — variant in the oxytocin receptor gene. The A allele associates with reduced oxytocin signaling, affecting social bonding, empathy, and stress response. Some studies link it to autism spectrum disorder susceptibility.",clinvar:"",sources:["snpedia","gwas"]},
+  // ENERGY
+  rs762551:   {mag:3,summary:"<strong>CYP1A2 -163C>A</strong> — the CC genotype (slow metabolizer) reduces caffeine clearance from the bloodstream. Slow metabolizers have prolonged caffeine half-life and are at higher cardiovascular risk from coffee consumption. Fast metabolizers (AA) clear caffeine efficiently and may derive more performance benefits.",clinvar:"",sources:["snpedia","gwas"]},
+  rs5751876:  {mag:2,summary:"<strong>ADORA2A 1976C>T</strong> — the TT genotype is associated with greater anxiety response to caffeine and stronger perceived effects. Caffeine works by blocking adenosine A2A receptors; this variant affects receptor expression and sensitivity.",clinvar:"",sources:["snpedia"]},
+  rs2016520:  {mag:2,summary:"<strong>PPARD T294C</strong> — the TT genotype is associated with reduced PPARD (peroxisome proliferator-activated receptor delta) activity, impairing fat oxidation during exercise and at rest. The C allele has been associated with elite endurance athlete status.",clinvar:"",sources:["snpedia","gwas"]},
+};
+
+// ════════════════════════════════════════════════════════════
+// SNP DATABASE
+// ════════════════════════════════════════════════════════════
+const SNP_DB = [
+  {gene:"ADIPOQ",rsid:"rs17300539",risk:["GA","AA"],cat:"obesity",fn:"Produção de adiponectina"},
+  {gene:"ADRB2",rsid:"rs1042713",risk:["AG","AA"],cat:"obesity",fn:"Regulação da taxa metabólica basal"},
+  {gene:"ADRB2",rsid:"rs1042714",risk:["CG","GG"],cat:"obesity",fn:"Regulação da taxa metabólica basal"},
+  {gene:"BDNF",rsid:"rs925946",risk:["TG","TT"],cat:"obesity",fn:"Comportamento alimentar e gasto energético"},
+  {gene:"ETV5",rsid:"rs7647305",risk:["CC"],cat:"obesity",fn:"Regulação do balanço energético"},
+  {gene:"FABP2",rsid:"rs1799883",risk:["CT","TT"],cat:"obesity",fn:"Absorção e transporte de ácidos graxos"},
+  {gene:"FTO",rsid:"rs9939609",risk:["AT","AA"],cat:"obesity",fn:"Supressão de Grelina e controle de saciedade"},
+  {gene:"FTO",rsid:"rs8050136",risk:["AC","AA"],cat:"obesity",fn:"Supressão de Grelina e controle de saciedade"},
+  {gene:"GNB3",rsid:"rs5443",risk:["CT","TT"],cat:"obesity",fn:"Transdução e sinalização celular transmembrana"},
+  {gene:"GNPDA2",rsid:"rs10938397",risk:["AG","GG"],cat:"obesity",fn:"Regulação do peso corporal"},
+  {gene:"LEP",rsid:"rs7799039",risk:["AA"],cat:"obesity",fn:"Leptina (hormônio da saciedade)"},
+  {gene:"LEPR",rsid:"rs1805094",risk:["GG"],cat:"obesity",fn:"Receptor de leptina no hipotálamo"},
+  {gene:"MC4R",rsid:"rs17782313",risk:["TC","CC"],cat:"obesity",fn:"Homeostase energética e apetite"},
+  {gene:"MC4R",rsid:"rs12970134",risk:["GA","AA"],cat:"obesity",fn:"Homeostase energética e apetite"},
+  {gene:"PCSK1",rsid:"rs6234",risk:["CG","GG"],cat:"obesity",fn:"Maturação e processamento de hormônios"},
+  {gene:"PPARG",rsid:"rs1801282",risk:["CG","GG"],cat:"obesity",fn:"Adipogênese e sensibilidade à insulina"},
+  {gene:"SH2B1",rsid:"rs7498665",risk:["AG","GG"],cat:"obesity",fn:"Regulação da sensibilidade à leptina"},
+  {gene:"UCP2",rsid:"rs659366",risk:["CT","TT"],cat:"obesity",fn:"Termogênese e gasto energético"},
+  {gene:"APOA2",rsid:"rs5082",risk:["GG"],cat:"obesity",fn:"Resposta a gorduras saturadas e lipoproteínas"},
+  {gene:"ABCG5",rsid:"rs6756629",risk:["GG"],cat:"lipids",fn:"Absorção intestinal de colesterol"},
+  {gene:"ABCG8",rsid:"rs4299376",risk:["GG"],cat:"lipids",fn:"Absorção intestinal de colesterol"},
+  {gene:"APOA1",rsid:"rs1799837",risk:["CT","TT"],cat:"lipids",fn:"Níveis de HDL"},
+  {gene:"APOA5",rsid:"rs662799",risk:["AG","GG"],cat:"lipids",fn:"Níveis de triglicerídeos"},
+  {gene:"APOB",rsid:"rs693",risk:["AG","AA"],cat:"lipids",fn:"Níveis de LDL"},
+  {gene:"APOB",rsid:"rs5742904",risk:["CT","TT"],cat:"lipids",fn:"Mutação familiar — apolipoproteína"},
+  {gene:"APOC3",rsid:"rs5128",risk:["CG","GG"],cat:"lipids",fn:"Inibição da Lipase Lipoproteica"},
+  {gene:"APOE",rsid:"rs429358",risk:["TC","TT"],cat:"lipids",fn:"Clearance VLDL e metabolismo lipídico (ε4)"},
+  {gene:"APOE",rsid:"rs7412",risk:["CC"],cat:"lipids",fn:"Metabolismo lipídico (ε2/ε4 haplótipo)"},
+  {gene:"CETP",rsid:"rs708272",risk:["GG"],cat:"lipids",fn:"Transferência de ésteres de colesterol"},
+  {gene:"HMGCR",rsid:"rs3846662",risk:["GG"],cat:"lipids",fn:"Síntese endógena de colesterol"},
+  {gene:"LDLR",rsid:"rs6511720",risk:["GG"],cat:"lipids",fn:"Captação celular de LDL"},
+  {gene:"LIPC",rsid:"rs1800588",risk:["CC"],cat:"lipids",fn:"Atividade da lipase hepática"},
+  {gene:"LPL",rsid:"rs13702",risk:["CT","TT"],cat:"lipids",fn:"Hidrólise de triglicerídeos"},
+  {gene:"PCSK9",rsid:"rs11206510",risk:["CT","TT"],cat:"lipids",fn:"Degradação do receptor de LDL"},
+  {gene:"PCSK9",rsid:"rs11591147",risk:["GG"],cat:"lipids",fn:"Degradação do receptor de LDL"},
+  {gene:"PCSK9",rsid:"rs505151",risk:["GA","GG"],cat:"lipids",fn:"Redução de receptores de LDL"},
+  {gene:"PON1",rsid:"rs854560",risk:["AT","TT"],cat:"lipids",fn:"Atividade antioxidante HDL"},
+  {gene:"PON1",rsid:"rs662",risk:["TC","CC"],cat:"lipids",fn:"Atividade antioxidante HDL (variante cardio)"},
+  {gene:"PSRC1",rsid:"rs599839",risk:["AA"],cat:"lipids",fn:"Regulação de colesterol"},
+  {gene:"CD36",rsid:"rs1527483",risk:["AG","AA"],cat:"omega",fn:"Transporte e captação de lipídios"},
+  {gene:"ELOVL2",rsid:"rs953413",risk:["GA","AA"],cat:"omega",fn:"Elongação de ácidos graxos poli-insaturados"},
+  {gene:"ENOS",rsid:"rs1799983",risk:["GT","TT"],cat:"omega",fn:"Síntese de óxido nítrico e saúde vascular"},
+  {gene:"FADS1",rsid:"rs174546",risk:["CT","TT"],cat:"omega",fn:"Atividade de dessaturases de ácidos graxos"},
+  {gene:"FADS2",rsid:"rs174616",risk:["GA","AA"],cat:"omega",fn:"Atividade de dessaturases de ácidos graxos"},
+  {gene:"MYRF",rsid:"rs174537",risk:["GT","GG"],cat:"omega",fn:"Regulação do metabolismo de ácidos graxos"},
+  {gene:"IGF2BP2",rsid:"rs4402960",risk:["GT","TT"],cat:"diabetes",fn:"Secreção de insulina e células beta"},
+  {gene:"IRS1",rsid:"rs2943641",risk:["CT","TT"],cat:"diabetes",fn:"Sinalização intracelular da insulina"},
+  {gene:"KCNJ11",rsid:"rs5219",risk:["CT","TT"],cat:"diabetes",fn:"Canais de potássio e secreção de insulina"},
+  {gene:"MTNR1B",rsid:"rs10830963",risk:["CG","GG"],cat:"diabetes",fn:"Receptor de melatonina e glicemia de jejum"},
+  {gene:"SLC30A8",rsid:"rs13266634",risk:["CT","CC"],cat:"diabetes",fn:"Transporte de zinco no pâncreas"},
+  {gene:"TCF7L2",rsid:"rs7903146",risk:["CT","TT"],cat:"diabetes",fn:"Homeostase da glicose e risco T2D"},
+  {gene:"MTHFR",rsid:"rs1801133",risk:["AA"],cat:"liver",fn:"Metilação e ciclo do folato (C677T)"},
+  {gene:"MTHFR",rsid:"rs1801131",risk:["GG"],cat:"liver",fn:"Metilação e ciclo do folato (A1298C)"},
+  {gene:"PEMT",rsid:"rs7946",risk:["CT","TT"],cat:"liver",fn:"Síntese de fosfatidilcolina"},
+  {gene:"TNF",rsid:"rs361525",risk:["AG","AA"],cat:"liver",fn:"Resposta inflamatória sistêmica"},
+  {gene:"TNF",rsid:"rs1800629",risk:["GA","AA"],cat:"liver",fn:"Resposta inflamatória e citocinas"},
+  {gene:"PNPLA3",rsid:"rs738409",risk:["CG","GG"],cat:"liver",fn:"Gordura no fígado (esteatose)"},
+  {gene:"NAT2",rsid:"rs1495741",risk:["AG","AA"],cat:"liver",fn:"Destoxificação e acetilação hepática"},
+  {gene:"ACE",rsid:"rs4343",risk:["AG","GG"],cat:"hypertension",fn:"Enzima conversora de angiotensina"},
+  {gene:"AGT",rsid:"rs699",risk:["GG"],cat:"hypertension",fn:"Regulação da pressão arterial"},
+  {gene:"AGTR1",rsid:"rs5186",risk:["AC","CC"],cat:"hypertension",fn:"Receptor tipo I da angiotensina II"},
+  {gene:"ALDH2",rsid:"rs671",risk:["GG"],cat:"hypertension",fn:"Metabolismo de álcool e risco cardiovascular"},
+  {gene:"ATP2B1",rsid:"rs2681492",risk:["CT","TT"],cat:"hypertension",fn:"Cálcio intracelular e pressão arterial"},
+  {gene:"EDN1",rsid:"rs5370",risk:["GT","TT"],cat:"hypertension",fn:"Endotelina-1 e regulação vascular"},
+  {gene:"LIPC",rsid:"rs2070895",risk:["AG","AA"],cat:"hypertension",fn:"Metabolismo lipídico e regulação pressórica"},
+  {gene:"IL6",rsid:"rs1800795",risk:["GC","GG"],cat:"inflammation",fn:"Interleucina-6 e inflamação"},
+  {gene:"IL1B",rsid:"rs1143643",risk:["CT","TT"],cat:"inflammation",fn:"Resposta imune inata e inflamação"},
+  {gene:"IL12B",rsid:"rs2082412",risk:["GG"],cat:"inflammation",fn:"Regulação da resposta imune"},
+  {gene:"IL23R",rsid:"rs2201841",risk:["GA","GG"],cat:"inflammation",fn:"Receptor de interleucina e defesa imune"},
+  {gene:"NOD2",rsid:"rs2066845",risk:["CG","CC"],cat:"inflammation",fn:"Reconhecimento bacteriano e imunidade intestinal"},
+  {gene:"CAT",rsid:"rs1001179",risk:["TT"],cat:"detox",fn:"Atividade da catalase (antioxidante)"},
+  {gene:"EPHX1",rsid:"rs1051740",risk:["TC","CC"],cat:"detox",fn:"Metabolismo de xenobióticos"},
+  {gene:"GPX1",rsid:"rs1050450",risk:["GA","AA"],cat:"detox",fn:"Glutationa peroxidase"},
+  {gene:"GSTM1",rsid:"rs2071487",risk:["DEL"],cat:"detox",fn:"Fase II destoxificação (glutationa)"},
+  {gene:"GSTM1",rsid:"rs74837985",risk:["DEL"],cat:"detox",fn:"Fase II destoxificação (variante adicional)"},
+  {gene:"GSTP1",rsid:"rs1695",risk:["GG"],cat:"detox",fn:"Conjugação de toxinas"},
+  {gene:"GSTP1",rsid:"rs1138272",risk:["CT","TT"],cat:"detox",fn:"Proteção contra radicais livres"},
+  {gene:"GSTT1",rsid:"rs2266633",risk:["DEL"],cat:"detox",fn:"Fase II destoxificação"},
+  {gene:"GSTT1",rsid:"rs2266637",risk:["DEL"],cat:"detox",fn:"Fase II destoxificação (variante adicional)"},
+  {gene:"HFE",rsid:"rs1799945",risk:["CG","GG"],cat:"detox",fn:"Absorção de ferro (H63D)"},
+  {gene:"HFE",rsid:"rs1800562",risk:["GA","AA"],cat:"detox",fn:"Absorção de ferro (C282Y) — hemocromatose"},
+  {gene:"NQO1",rsid:"rs1800566",risk:["GA","AA"],cat:"detox",fn:"Ciclo CoQ10 e proteção celular"},
+  {gene:"NQO1",rsid:"rs1131341",risk:["GA","AA"],cat:"detox",fn:"Atividade antioxidante"},
+  {gene:"NRF2",rsid:"rs6721961",risk:["TT"],cat:"detox",fn:"Regulação mestre da resposta antioxidante"},
+  {gene:"SIRT6",rsid:"rs107251",risk:["TT"],cat:"detox",fn:"Reparo de DNA e envelhecimento"},
+  {gene:"SOD2",rsid:"rs4880",risk:["GG"],cat:"detox",fn:"Superóxido dismutase mitocondrial"},
+  {gene:"XRCC1",rsid:"rs25487",risk:["CT","TT"],cat:"detox",fn:"Reparo de danos no DNA"},
+  {gene:"CYP27B1",rsid:"rs10877012",risk:["GT","GG"],cat:"vitamins",fn:"Ativação da vitamina D"},
+  {gene:"GC",rsid:"rs2282679",risk:["GT","GG"],cat:"vitamins",fn:"Transporte de vitamina D"},
+  {gene:"VDR",rsid:"rs2228570",risk:["GA","AA"],cat:"vitamins",fn:"Receptor de vitamina D (Fok I)"},
+  {gene:"VDR",rsid:"rs731236",risk:["GG"],cat:"vitamins",fn:"Receptor de vitamina D (Taq I)"},
+  {gene:"CBS",rsid:"rs234706",risk:["GG"],cat:"vitamins",fn:"Conversão de homocisteína"},
+  {gene:"MTR",rsid:"rs1805087",risk:["AA"],cat:"vitamins",fn:"Remetilação da homocisteína"},
+  {gene:"MTRR",rsid:"rs1801394",risk:["GG"],cat:"vitamins",fn:"Ativação da metionina sintase"},
+  {gene:"SLC19A1",rsid:"rs1051266",risk:["CT","TT"],cat:"vitamins",fn:"Transporte de folato"},
+  {gene:"TCN2",rsid:"rs1801198",risk:["GG"],cat:"vitamins",fn:"Transporte de vitamina B12"},
+  {gene:"BCMO1",rsid:"rs7501331",risk:["CT","TT"],cat:"vitamins",fn:"Conversão de betacaroteno em Vitamina A"},
+  {gene:"BCMO1",rsid:"rs12934922",risk:["AT","TT"],cat:"vitamins",fn:"Conversão de betacaroteno em Vitamina A"},
+  {gene:"NBPF3",rsid:"rs4654748",risk:["CT","CC"],cat:"vitamins",fn:"Vitamina B6"},
+  {gene:"CHDH",rsid:"rs9001",risk:["TG","TT"],cat:"vitamins",fn:"Metabolismo da colina"},
+  {gene:"CHDH",rsid:"rs12676",risk:["CA","AA"],cat:"vitamins",fn:"Metabolismo da colina"},
+  {gene:"CHKA",rsid:"rs10791957",risk:["CA","AA"],cat:"vitamins",fn:"Biossíntese de fosfatidilcolina"},
+  {gene:"CHKB",rsid:"rs1557502",risk:["CT","TT"],cat:"vitamins",fn:"Biossíntese de fosfatidilcolina"},
+  {gene:"SLC44A1",rsid:"rs3199966",risk:["GT","TT"],cat:"vitamins",fn:"Transporte de colina"},
+  {gene:"FUT2",rsid:"rs602662",risk:["GG"],cat:"vitamins",fn:"Absorção intestinal de vitamina B12"},
+  {gene:"SLC23A1",rsid:"rs33972313",risk:["CT","TT"],cat:"vitamins",fn:"Transporte de Vitamina C"},
+  {gene:"CaSR",rsid:"rs17251221",risk:["AG","GG"],cat:"vitamins",fn:"Homeostase de cálcio e magnésio"},
+  {gene:"CaSR",rsid:"rs6776158",risk:["AG","GG"],cat:"vitamins",fn:"Homeostase de cálcio e magnésio"},
+  {gene:"CaSR",rsid:"rs7652589",risk:["GA","AA"],cat:"vitamins",fn:"Homeostase de cálcio e magnésio"},
+  {gene:"CaSR",rsid:"rs1501899",risk:["GA","AA"],cat:"vitamins",fn:"Homeostase de cálcio e magnésio"},
+  {gene:"TF",rsid:"rs1049296",risk:["TT"],cat:"vitamins",fn:"Transporte de ferro (transferrina)"},
+  {gene:"TF",rsid:"rs3811647",risk:["AA"],cat:"vitamins",fn:"Transporte de ferro (transferrina)"},
+  {gene:"TFRC",rsid:"rs3817672",risk:["TT"],cat:"vitamins",fn:"Captação celular de ferro"},
+  {gene:"TMPRSS6",rsid:"rs4820268",risk:["GG"],cat:"vitamins",fn:"Regulação do ferro"},
+  {gene:"MCM6",rsid:"rs4988235",risk:["GG"],cat:"gut",fn:"Intolerância à lactose (LCT)"},
+  {gene:"HLA",rsid:"rs2187668",risk:["CT","TT"],cat:"gut",fn:"Doença celíaca (DQ2/DQ8)"},
+  {gene:"HLA",rsid:"rs2395182",risk:["GT","TT"],cat:"gut",fn:"Doença celíaca (DQ2/DQ8)"},
+  {gene:"HLA",rsid:"rs7775228",risk:["CT","CC"],cat:"gut",fn:"Doença celíaca (DQ2/DQ8)"},
+  {gene:"HLA",rsid:"rs7454108",risk:["CT","CC"],cat:"gut",fn:"Doença celíaca (DQ2/DQ8)"},
+  {gene:"COMT",rsid:"rs4680",risk:["AA"],cat:"gut",fn:"Degradação de dopamina (intestino irritável)"},
+  {gene:"CYP1A2",rsid:"rs762551",risk:["CA","CC"],cat:"energy",fn:"Metabolização de cafeína"},
+  {gene:"ADORA2A",rsid:"rs5751876",risk:["TT"],cat:"energy",fn:"Receptor de adenosina e cafeína"},
+  {gene:"PGC1A",rsid:"rs8192678",risk:["TT"],cat:"energy",fn:"Metabolismo energético mitocondrial"},
+  {gene:"PPARD",rsid:"rs2016520",risk:["TT"],cat:"energy",fn:"Metabolismo lipídico e beta-oxidação"},
+  {gene:"SLC16A1",rsid:"rs1049434",risk:["AT","AA"],cat:"energy",fn:"Transporte de lactato"},
+  {gene:"CKMM",rsid:"rs8111989",risk:["TC","CC"],cat:"energy",fn:"Enzima creatina quinase muscular"},
+  {gene:"CLOCK",rsid:"rs1801260",risk:["GA","GG"],cat:"circadian",fn:"Ritmos circadianos"},
+  {gene:"CRY1",rsid:"rs2287161",risk:["CC"],cat:"circadian",fn:"Padrão de sono"},
+  {gene:"CRY2",rsid:"rs11605924",risk:["AC","CC"],cat:"circadian",fn:"Padrão de sono"},
+  {gene:"CRY2",rsid:"rs7123390",risk:["AG","AA"],cat:"circadian",fn:"Padrão de sono"},
+  {gene:"MTNR1B",rsid:"rs10830963",risk:["CG","GG"],cat:"circadian",fn:"Receptor de melatonina"},
+  {gene:"PER2",rsid:"rs4663302",risk:["TT"],cat:"circadian",fn:"Marca-passo circadiano"},
+  {gene:"PER2",rsid:"rs934945",risk:["CT","CC"],cat:"circadian",fn:"Marca-passo circadiano"},
+  {gene:"PER3",rsid:"rs228697",risk:["CG","GG"],cat:"circadian",fn:"Marca-passo circadiano"},
+  {gene:"ESR1",rsid:"rs2234693",risk:["CT","CC"],cat:"hormones",fn:"Transcrição responsiva ao estrógeno"},
+  {gene:"ESR1",rsid:"rs9340799",risk:["GA","GG"],cat:"hormones",fn:"Transcrição responsiva ao estrógeno"},
+  {gene:"ESR1",rsid:"rs2228480",risk:["GA","AA"],cat:"hormones",fn:"Transcrição responsiva ao estrógeno"},
+  {gene:"ESR2",rsid:"rs2987983",risk:["GA","GG"],cat:"hormones",fn:"Receptor de estrogênio beta"},
+  {gene:"DIO1",rsid:"rs11206244",risk:["CT","TT"],cat:"hormones",fn:"Ativação do hormônio T3"},
+  {gene:"DIO1",rsid:"rs2235544",risk:["AC","CC"],cat:"hormones",fn:"Ativação do hormônio T3"},
+  {gene:"DIO2",rsid:"rs12885300",risk:["CC"],cat:"hormones",fn:"Produção local de T3"},
+  {gene:"DIO2",rsid:"rs225014",risk:["CC"],cat:"hormones",fn:"Produção local de T3 (Thr92Ala)"},
+  {gene:"COMT",rsid:"rs4680",risk:["AA"],cat:"neuro",fn:"Dopamina no córtex pré-frontal"},
+  {gene:"DRD1",rsid:"rs686",risk:["AA"],cat:"neuro",fn:"Receptor D1 de dopamina"},
+  {gene:"DRD2",rsid:"rs1076560",risk:["AA"],cat:"neuro",fn:"Densidade de receptores D2"},
+  {gene:"DRD2",rsid:"rs1800497",risk:["AA"],cat:"neuro",fn:"Densidade de receptores D2"},
+  {gene:"HTR2A",rsid:"rs6311",risk:["CT","CC"],cat:"neuro",fn:"Receptor de serotonina"},
+  {gene:"OXTR",rsid:"rs2254298",risk:["GA","AA"],cat:"neuro",fn:"Receptor de ocitocina"},
+  {gene:"ACTN3",rsid:"rs1815739",risk:["CC"],cat:"sport",fn:"Fibras musculares de explosão/força"},
+  {gene:"AGT",rsid:"rs699",risk:["GG"],cat:"sport",fn:"Pressão arterial e aptidão física"},
+  {gene:"PPARA",rsid:"rs4253778",risk:["CG","CC"],cat:"sport",fn:"Metabolismo lipídico e resistência"},
+  {gene:"ENOS",rsid:"rs2070744",risk:["TT"],cat:"sport",fn:"Óxido nítrico e vasodilatação muscular"},
+  {gene:"AQP1",rsid:"rs1049305",risk:["GG"],cat:"sport",fn:"Hidratação celular"},
+  {gene:"BDKRB2",rsid:"rs1799722",risk:["CT","CC"],cat:"sport",fn:"Vasodilatação muscular"},
+  {gene:"GABPB1",rsid:"rs7181866",risk:["AA"],cat:"sport",fn:"Função mitocondrial"},
+  {gene:"NFIA-AS2",rsid:"rs1572312",risk:["GG"],cat:"sport",fn:"Hemoglobina e capacidade aeróbica"},
+  {gene:"NRF2",rsid:"rs12594956",risk:["CC"],cat:"sport",fn:"Transcrição antioxidante"},
+  {gene:"NRF2",rsid:"rs8031031",risk:["CC"],cat:"sport",fn:"Transcrição antioxidante (variante adicional)"},
+  {gene:"PPARD",rsid:"rs2267668",risk:["AG","GG"],cat:"sport",fn:"Biogênese mitocondrial"},
+  {gene:"TFAM",rsid:"rs1937",risk:["GG"],cat:"sport",fn:"Função mitocondrial"},
+  {gene:"CNTF",rsid:"rs1800169",risk:["GG"],cat:"sport",fn:"Sobrevivência neuronal e neurotransmissores"},
+  {gene:"GALNTL6",rsid:"rs558129",risk:["GG"],cat:"sport",fn:"Atividade de N-acetilgalactosaminiltransferase"},
+  {gene:"IGF2AS",rsid:"rs7924316",risk:["TT"],cat:"sport",fn:"Fator de crescimento (IGF)"},
+  {gene:"COL1A1",rsid:"rs1800012",risk:["CT","CC"],cat:"sport",fn:"Colágeno tipo I (tendões e ossos)"},
+  {gene:"COL5A1",rsid:"rs12722",risk:["CT","TT"],cat:"sport",fn:"Colágeno tipo V"},
+  {gene:"COL5A1",rsid:"rs10628678",risk:["AA"],cat:"sport",fn:"Colágeno tipo V (variante adicional)"},
+  {gene:"GDF5",rsid:"rs143383",risk:["TT"],cat:"sport",fn:"Cartilagem e articulações"},
+  {gene:"MMP1",rsid:"rs1799750",risk:["TCTC"],cat:"sport",fn:"Remodelação tecidual e colágeno"},
+  {gene:"MMP3",rsid:"rs679620",risk:["TC","CC"],cat:"sport",fn:"Tendinopatia de aquiles"},
+  {gene:"MMP10",rsid:"rs486055",risk:["CC"],cat:"sport",fn:"Metaloproteinase extracelular"},
+  {gene:"MMP12",rsid:"rs2276109",risk:["TT"],cat:"sport",fn:"Metaloproteinase extracelular"},
+  {gene:"MYLK",rsid:"rs28497577",risk:["GT","TT"],cat:"sport",fn:"Quinase de cadeia leve de miosina"},
+  {gene:"MYLK",rsid:"rs2700352",risk:["GT","TT"],cat:"sport",fn:"Quinase de cadeia leve de miosina"},
+  {gene:"WNT16",rsid:"rs2707466",risk:["CT","CC"],cat:"sport",fn:"Densidade mineral óssea"},
+  {gene:"ADAMTS7",rsid:"rs3825807",risk:["GA","AA"],cat:"cardio",fn:"Migração de células musculares vasculares"},
+  {gene:"CDKN2A",rsid:"rs10757278",risk:["GA","GG"],cat:"cardio",fn:"Ciclo celular e supressão tumoral"},
+  {gene:"F2",rsid:"rs1799963",risk:["GA","AA"],cat:"cardio",fn:"Trombose — protrombina"},
+  {gene:"F5",rsid:"rs6025",risk:["CT","TT"],cat:"cardio",fn:"Trombose — Fator V Leiden"},
+  {gene:"F5",rsid:"rs1800595",risk:["CT","CC"],cat:"cardio",fn:"Coagulação — haplótipo R2"},
+  {gene:"FGB",rsid:"rs1800790",risk:["AA"],cat:"cardio",fn:"Hemostasia (fibrinogênio)"},
+  {gene:"FXIII",rsid:"rs5985",risk:["CA","AA"],cat:"cardio",fn:"Estabilização da rede de fibrina"},
+  {gene:"ITGB3",rsid:"rs5918",risk:["CT","CC"],cat:"cardio",fn:"Ativação plaquetária"},
+  {gene:"MTHFD1L",rsid:"rs6922269",risk:["GA","AA"],cat:"cardio",fn:"Metabolismo do folato"},
+  {gene:"SERPINE1",rsid:"rs587776796",risk:["DEL"],cat:"cardio",fn:"Fibrinólise (PAI-1)"},
+  {gene:"SH2B3",rsid:"rs3184504",risk:["CT","TT"],cat:"cardio",fn:"Sinalização JAK2 e plaquetas"},
+  {gene:"SIRT1",rsid:"rs7069102",risk:["CG","CC"],cat:"cardio",fn:"Proteção vascular e NRF2"},
+  {gene:"WDR12",rsid:"rs6725887",risk:["CT","CC"],cat:"cardio",fn:"Risco de IAM"},
+  {gene:"ABCB1",rsid:"rs1045642",risk:["CC"],cat:"cardio",fn:"Biodisponibilidade de varfarina"},
+  {gene:"CYP4F2",rsid:"rs2108622",risk:["CT","TT"],cat:"cardio",fn:"Metabolismo vitamina K e varfarina"},
+  {gene:"VKORC1L1",rsid:"rs4072874",risk:["TG","GG"],cat:"cardio",fn:"Ciclo vitamina K — sensibilidade à varfarina"},
+  {gene:"HERC2",rsid:"rs12913832",risk:["CA","CC"],cat:"skin",fn:"Pigmentação cutânea"},
+  {gene:"IRF4",rsid:"rs12203592",risk:["TT"],cat:"skin",fn:"Pigmentação e sensibilidade UV"},
+  {gene:"MACROH2A2",rsid:"rs16927253",risk:["CC"],cat:"skin",fn:"Envelhecimento celular"},
+  {gene:"MACROH2A2",rsid:"rs4746957",risk:["GG"],cat:"skin",fn:"Envelhecimento celular"},
+  {gene:"MC1R",rsid:"rs4268748",risk:["CC"],cat:"skin",fn:"Produção de melanina"},
+  {gene:"MC1R",rsid:"rs2228479",risk:["GC","CC"],cat:"skin",fn:"Produção de melanina"},
+  {gene:"MMP1",rsid:"rs1799750",risk:["TCTC"],cat:"skin",fn:"Degradação de colágeno e envelhecimento"},
+  {gene:"NQO1",rsid:"rs1131341",risk:["GA","AA"],cat:"skin",fn:"Atividade antioxidante cutânea"},
+  {gene:"NQO1",rsid:"rs1800566",risk:["GA","AA"],cat:"skin",fn:"CoQ10 e proteção celular"},
+  {gene:"STXBP5L",rsid:"rs322458",risk:["CT","CC"],cat:"skin",fn:"Envelhecimento e insulina"},
+  {gene:"HIF1A",rsid:"rs11549465",risk:["CC"],cat:"skin",fn:"Homeostase à hipoxia (celulite)"},
+  {gene:"FN1",rsid:"rs3910516",risk:["GG"],cat:"skin",fn:"Matriz extracelular (estrias)"},
+  {gene:"TGFB2",rsid:"rs1159268",risk:["GA","AA"],cat:"skin",fn:"Queratinócitos (acne)"},
+  {gene:"FLG",rsid:"rs61816761",risk:["AA"],cat:"skin",fn:"Barreira cutânea e hidratação"},
+];
+
+// ════════════════════════════════════════════════════════════
+// CATEGORY META
+// ════════════════════════════════════════════════════════════
+const CAT_META = {
+  obesity:{label:"Obesity & Energy",color:"#fbbf24"},
+  lipids:{label:"Lipids & Cholesterol",color:"#60a5fa"},
+  omega:{label:"Omega 3/6 Fatty Acids",color:"#a78bfa"},
+  diabetes:{label:"Diabetes & Glycemia",color:"#f87171"},
+  liver:{label:"Liver & Methylation",color:"#22c55e"},
+  hypertension:{label:"Hypertension",color:"#ef4444"},
+  inflammation:{label:"Inflammation",color:"#f59e0b"},
+  detox:{label:"Detox & Oxidative",color:"#14b8a6"},
+  vitamins:{label:"Vitamins & Minerals",color:"#10b981"},
+  gut:{label:"Gut Health",color:"#d946ef"},
+  energy:{label:"Bioenergetics",color:"#eab308"},
+  circadian:{label:"Circadian Rhythm",color:"#8b5cf6"},
+  hormones:{label:"Hormones",color:"#f472b6"},
+  neuro:{label:"Neurotransmitters",color:"#6366f1"},
+  sport:{label:"Sport & Fitness",color:"#10b981"},
+  cardio:{label:"Cardio & Coagulation",color:"#f87171"},
+  skin:{label:"Skin Health",color:"#fb923c"},
+};
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let userGenos = {};
+let results = [];
+let currentView = 'cards';
+let currentSort = 'magnitude';
+let filter = {cat:'all', repute:'all', search:''};
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('db-badge').textContent = SNP_DB.length+' SNPs';
+  document.getElementById('snp-count-hero').textContent = SNP_DB.length;
+  const zone = document.getElementById('drop-zone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processFile(f);});
+  document.getElementById('file-input').addEventListener('change',e=>{if(e.target.files[0])processFile(e.target.files[0]);});
+});
+
+// ════════════════════════════════════════════════════════════
+// FILE PROCESSING
+// ════════════════════════════════════════════════════════════
+const TARGET_SET = new Set(SNP_DB.map(s => s.rsid.toLowerCase()));
+
+function processFile(file){
+  const sizeLabel = file.size > 1e6 ? (file.size/1e6).toFixed(1)+'MB' : Math.round(file.size/1024)+'KB';
+  setLoading('Reading file (' + sizeLabel + ')…');
+  const r = new FileReader();
+  r.onerror = () => { hideLoading(); alert('Could not read file.'); };
+  r.onload = e => {
+    setLoading('Scanning for panel SNPs…');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      try {
+        const g = parseDNA(e.target.result);
+        if(!Object.keys(g).length){
+          hideLoading();
+          alert('No panel SNPs found.\n\nExpected: 23andMe or Ancestry tab-separated .txt file.\nMake sure the file is not zipped.');
+          return;
+        }
+        document.getElementById('file-chip').textContent = file.name;
+        document.getElementById('file-chip').style.display = '';
+        document.getElementById('reset-btn').style.display = '';
+        runAnalysis(g);
+      } catch(err) { hideLoading(); alert('Parse error: ' + err.message); }
+    }));
+  };
+  r.readAsText(file, 'UTF-8');
+}
+
+function parseDNA(text){
+  const out = {};
+  const lines = text.split(/\r?\n/);
+  for(let i = 0; i < lines.length; i++){
+    const line = lines[i];
+    if(!line || line.charCodeAt(0) === 35) continue;
+    const tab1 = line.indexOf('\t');
+    if(tab1 === -1) continue;
+    const id = line.substring(0, tab1).toLowerCase();
+    if(!TARGET_SET.has(id)) continue;
+    const tab2 = line.indexOf('\t', tab1 + 1);
+    const tab3 = line.indexOf('\t', tab2 + 1);
+    if(tab3 === -1) continue;
+    const tab4 = line.indexOf('\t', tab3 + 1);
+    const gt = (tab4 === -1 ? line.substring(tab3 + 1) : line.substring(tab3 + 1, tab4)).trim();
+    if(!gt || gt === '--' || gt === 'NC' || gt === 'NN' || gt === '00') continue;
+    out[id] = gt.toUpperCase();
+  }
+  return out;
+}
+
+function norm(gt){
+  if(!gt)return null;
+  if(gt.length===2)return gt.split('').sort().join('');
+  return gt;
+}
+
+function isRisk(gt,riskAlleles){
+  if(!gt)return false;
+  const n=norm(gt);
+  for(const ra of riskAlleles){
+    if(ra==='DEL'){if(gt==='DEL'||gt===''||gt==='--')return true;continue;}
+    if(n===norm(ra))return true;
+  }
+  return false;
+}
+
+// ════════════════════════════════════════════════════════════
+// ANALYSIS
+// ════════════════════════════════════════════════════════════
+function runAnalysis(genos){
+  userGenos=genos;
+  // Map lookups only — instant regardless of file size
+  results=SNP_DB.map(snp=>{
+    const info=SNPINFO[snp.rsid]||null;
+    const userGt=genos[snp.rsid.toLowerCase()]||null;
+    const found=!!userGt;
+    const hasRisk=found&&isRisk(userGt,snp.risk);
+    const status=!found?'not_found':hasRisk?'risk':'neutral';
+    // Keep snp.risk (array of risk alleles) intact — use hasRisk for boolean
+    return {...snp,info,userGt,found,hasRisk,status,mag:info?info.mag:2,repute:!found?'gray':hasRisk?'bad':'good'};
+  });
+  updateStats();
+  buildCatFilters();
+  showResults();
+  hideLoading();
+  applyFilters();
+}
+
+function updateStats(){
+  const found=results.filter(r=>r.found).length;
+  const risk=results.filter(r=>r.hasRisk).length;
+  const neu=results.filter(r=>r.found&&!r.hasRisk).length;
+  document.getElementById('s-total').textContent=results.length;
+  document.getElementById('s-found').textContent=found;
+  document.getElementById('s-risk').textContent=risk;
+  document.getElementById('s-neu').textContent=neu;
+  document.getElementById('footer-txt').textContent=`${found} of ${results.length} SNPs matched · ${risk} risk variants · ${neu} neutral · Data never leaves your browser`;
+}
+
+// ════════════════════════════════════════════════════════════
+// FILTERS
+// ════════════════════════════════════════════════════════════
+function buildCatFilters(){
+  const cnt={};
+  results.forEach(r=>cnt[r.cat]=(cnt[r.cat]||0)+1);
+  const list=document.getElementById('cat-list');
+  list.innerHTML='';
+  const allBtn=makeFilterBtn('All categories','all',true,null,results.length);
+  list.appendChild(allBtn);
+  Object.entries(CAT_META).forEach(([cat,meta])=>{
+    if(!cnt[cat])return;
+    list.appendChild(makeFilterBtn(meta.label,cat,false,meta.color,cnt[cat]));
+  });
+}
+
+function makeFilterBtn(label,cat,active,color,count){
+  const div=document.createElement('div');
+  div.className='flt'+(active?' active':'');
+  div.onclick=()=>setCat(cat,div);
+  div.dataset.cat=cat;
+  div.innerHTML=`<span class="flt-name"><span class="flt-dot" style="${color?'background:'+color+';opacity:1;':'background:var(--text3);opacity:0.6;'}"></span>${label}</span><span class="flt-cnt">${count}</span>`;
+  return div;
+}
+
+function setCat(cat,el){
+  filter.cat=cat;
+  document.querySelectorAll('.flt').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setRepute(rep,btn){
+  filter.repute=rep;
+  document.querySelectorAll('.rep-btn').forEach(b=>{
+    b.className='rep-btn';
+  });
+  btn.className='rep-btn active-'+rep;
+  applyFilters();
+}
+
+function applyFilters(){
+  filter.search=(document.getElementById('search-box').value||'').toLowerCase().trim();
+  let f=results.filter(r=>{
+    if(filter.cat!=='all'&&r.cat!==filter.cat)return false;
+    if(filter.repute==='bad'&&r.repute!=='bad')return false;
+    if(filter.repute==='good'&&r.repute!=='good')return false;
+    if(filter.repute==='gray'&&r.repute!=='gray')return false;
+    if(filter.search){
+      const q=filter.search;
+      return r.rsid.includes(q)||r.gene.toLowerCase().includes(q)||r.fn.toLowerCase().includes(q)||(r.info&&r.info.summary.toLowerCase().includes(q));
+    }
+    return true;
+  });
+  f=sortData(f);
+  document.getElementById('r-count').textContent=f.length;
+  if(currentView==='cards')renderCards(f);
+  else renderTable(f);
+}
+
+function sortData(arr){
+  return [...arr].sort((a,b)=>{
+    if(currentSort==='magnitude')return b.mag-a.mag;
+    if(currentSort==='gene')return a.gene.localeCompare(b.gene);
+    if(currentSort==='category')return a.cat.localeCompare(b.cat);
+    if(currentSort==='status'){const o={risk:0,neutral:1,not_found:2};return(o[a.status]??3)-(o[b.status]??3);}
+    return 0;
+  });
+}
+
+function setSort(col,el){
+  currentSort=col;
+  document.querySelectorAll('.sort-opt').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setView(v,btn){
+  currentView=v;
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cards-view').style.display=v==='cards'?'block':'none';
+  document.getElementById('table-view').style.display=v==='table'?'block':'none';
+  applyFilters();
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER CARDS
+// ════════════════════════════════════════════════════════════
+function buildCard(r){
+  const info=r.info||{};
+  const catMeta=CAT_META[r.cat]||{label:r.cat,color:'#888'};
+  const snpediaUrl=`https://www.snpedia.com/index.php/${r.rsid}`;
+  const clinvarUrl=`https://www.ncbi.nlm.nih.gov/clinvar/?term=${r.rsid}`;
+  const gwasUrl=`https://www.ebi.ac.uk/gwas/variants/${r.rsid}`;
+  const gtClass=!r.found?'na-gt':r.hasRisk?'risk-gt':'good-gt';
+  const reputeHtml=!r.found
+    ?'<span class="repute-pill notfound">not in file</span>'
+    :r.hasRisk?'<span class="repute-pill bad">Bad — risk variant</span>'
+    :'<span class="repute-pill good">Good — neutral/protective</span>';
+  const mag=r.mag||2;
+  const dots=Array.from({length:5},(_,i)=>`<span class="mag-dot${i<Math.ceil(mag/2)?' filled':''}"></span>`).join('');
+  const summary=info.summary
+    ?`<p class="snp-summary">${info.summary}</p>`
+    :`<p class="snp-summary">This variant in <strong>${r.gene}</strong> is associated with: ${r.fn}.</p>`;
+  const cvClass=info.clinvar?(info.clinvar.toLowerCase().includes('pathogenic')?'pathogenic':''):'';
+  const clinvarHtml=info.clinvar?`<span class="clinvar-sig ${cvClass}">ClinVar: ${info.clinvar}</span>`:'';
+  const srcBadges=(info.sources||['snpedia']).map(s=>{
+    if(s==='snpedia')return `<a class="source-badge src-snpedia" href="${snpediaUrl}" target="_blank">SNPedia ↗</a>`;
+    if(s==='clinvar')return `<a class="source-badge src-clinvar" href="${clinvarUrl}" target="_blank">ClinVar ↗</a>`;
+    if(s==='gwas')return `<a class="source-badge src-gwas" href="${gwasUrl}" target="_blank">GWAS ↗</a>`;
+    if(s==='omim')return `<a class="source-badge src-omim" href="https://omim.org/" target="_blank">OMIM ↗</a>`;
+    return '';
+  }).join('');
+  return `<div class="snp-card repute-${r.repute}${!r.found?' not-in-file':''}">
+    <div class="card-header">
+      <div class="card-rsid-block">
+        <a class="card-rsid" href="${snpediaUrl}" target="_blank">${r.rsid} <span class="card-rsid-link">↗</span></a>
+        <div class="card-gene">${r.gene} · <span style="color:var(--text3)">${catMeta.label}</span></div>
+      </div>
+      <div class="card-meta-right">
+        <div class="genotype-display ${gtClass}">${r.userGt||'n/a'}</div>
+        <div class="mag-badge"><span class="mag-dots">${dots}</span> ${mag}/10</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="repute-row">${reputeHtml}<span class="cat-pill cat-${r.cat}">${catMeta.label}</span>${clinvarHtml}</div>
+      ${summary}
+      <div class="risk-allele-row">Risk alleles: <span>${r.risk.join(', ')}</span>  ·  Your genotype: <span>${r.userGt||'—'}</span></div>
+      <div class="sources-row">${srcBadges}</div>
+    </div>
+  </div>`;
+}
+
+let _renderPending=null;
+function renderCards(rows){
+  const grid=document.getElementById('cards-grid');
+  const nr=document.getElementById('no-results');
+  if(_renderPending){cancelAnimationFrame(_renderPending);_renderPending=null;}
+  if(!rows.length){grid.innerHTML='';nr.style.display='block';return;}
+  nr.style.display='none';
+  // Paint first 12 cards immediately — user sees content at once
+  const FIRST=12;
+  grid.innerHTML=rows.slice(0,FIRST).map(buildCard).join('');
+  if(rows.length<=FIRST)return;
+  // Stream the rest card-by-card in idle frames so UI stays responsive
+  let i=FIRST;
+  function paintNext(){
+    const chunk=rows.slice(i,i+8);
+    grid.insertAdjacentHTML('beforeend',chunk.map(buildCard).join(''));
+    i+=8;
+    if(i<rows.length)_renderPending=requestAnimationFrame(paintNext);
+  }
+  _renderPending=requestAnimationFrame(paintNext);
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER TABLE
+// ════════════════════════════════════════════════════════════
+function renderTable(rows){
+  const tbody=document.getElementById('table-body');
+  const nr=document.getElementById('no-results');
+  if(!rows.length){tbody.innerHTML='';nr.style.display='block';return;}
+  nr.style.display='none';
+  tbody.innerHTML=rows.map(r=>{
+    const info=r.info||{};
+    const catMeta=CAT_META[r.cat]||{label:r.cat};
+    const gtClass=!r.found?'na-gt':r.hasRisk?'risk-gt':'good-gt';
+    const reputeTxt=!r.found?'<span style="color:var(--text3)">—</span>':r.hasRisk?'<span style="color:var(--red)">⬤ Bad</span>':'<span style="color:var(--green)">⬤ Good</span>';
+    const cvHtml=info.clinvar?`<span style="font-size:10px;color:${info.clinvar.toLowerCase().includes('pathogenic')?'var(--red)':'var(--text2)'}">${info.clinvar}</span>`:'<span style="color:var(--text3)">—</span>';
+    const summary=(info.summary||r.fn).replace(/<[^>]+>/g,'').substring(0,80)+'…';
+    return `<tr class="${r.found?'':'not-in-file'}">
+      <td><a href="https://www.snpedia.com/index.php/${r.rsid}" target="_blank" style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--blue)">${r.gene}</a></td>
+      <td><span style="font-family:var(--mono);font-size:11px;color:var(--text2)">${r.rsid}</span></td>
+      <td><span class="genotype-display ${gtClass}" style="font-size:12px;padding:2px 7px">${r.userGt||'—'}</span></td>
+      <td>${reputeTxt}</td>
+      <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber)">${r.mag||2}/10</span></td>
+      <td><span class="cat-pill cat-${r.cat}">${catMeta.label}</span></td>
+      <td>${cvHtml}</td>
+      <td><span style="font-size:11px;color:var(--text2)">${summary}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// DEMO DATA
+// ════════════════════════════════════════════════════════════
+function loadDemo(){
+  setLoading('Loading demo data…');
+  const lines=[
+    '# Demo 23andMe raw data',
+    '# rsid\tchromosome\tposition\tgenotype',
+    'rs9939609\t16\t53786615\tAT','rs1801133\t1\t11856378\tAA',
+    'rs4680\t22\t19951271\tAA','rs7903146\t10\t112998590\tCT',
+    'rs1800629\t6\t31543031\tGA','rs5443\t12\t6883561\tCT',
+    'rs1799883\t4\t120069532\tCT','rs762551\t15\t75041917\tAC',
+    'rs1042713\t5\t148826877\tAG','rs1801282\t3\t12393125\tCG',
+    'rs1800795\t7\t22766645\tGG','rs4988235\t2\t136608646\tAG',
+    'rs662799\t11\t116648917\tAG','rs7799039\t7\t127881368\tGA',
+    'rs5219\t11\t17408630\tCT','rs2187668\t6\t32713862\tCT',
+    'rs10830963\t11\t92708710\tCG','rs1799963\t11\t46761055\tGA',
+    'rs6025\t1\t169519049\tCC','rs4880\t6\t159692840\tAG',
+    'rs1050450\t3\t49394834\tGA','rs1695\t11\t67352689\tAG',
+    'rs8192678\t4\t23808039\tGA','rs174546\t11\t61570783\tCT',
+    'rs2228570\t12\t48272895\tGA','rs11206244\t1\t58864561\tCT',
+    'rs2234693\t6\t152098723\tCT','rs1815739\t11\t66560624\tCT',
+    'rs429358\t19\t45411941\tCC','rs7412\t19\t45412079\tCT',
+    'rs12722\t9\t137673107\tCT','rs1800566\t16\t69745145\tGA',
+    'rs738409\t22\t44324727\tCG','rs2082412\t5\t158739428\tAG',
+    'rs2943641\t2\t227660964\tCT','rs4402960\t3\t185511687\tGT',
+    'rs13266634\t8\t118184783\tCT','rs5128\t11\t116655020\tCG',
+    'rs708272\t16\t56994528\tAG','rs1800588\t15\t58723675\tCC',
+    'rs925946\t11\t27536909\tTG','rs1801131\t1\t11854476\tAA',
+    'rs7946\t17\t17714470\tCT','rs10877012\t12\t4370199\tGT',
+    'rs2282679\t4\t71985578\tGT','rs1805087\t1\t236870044\tAA',
+    'rs1801394\t5\t7870860\tAG','rs693\t2\t21085700\tAG',
+    'rs7501331\t16\t81257803\tCT','rs12934922\t16\t81262269\tAT',
+    'rs1049305\t7\t30946917\tAG','rs1800012\t17\t48259740\tCT',
+    'rs5918\t17\t42448959\tCT','rs2108622\t19\t15879621\tCT',
+    'rs1045642\t7\t87138645\tCC','rs4253778\t22\t45164783\tGG',
+    'rs2254298\t3\t8795334\tGA','rs1800497\t11\t113270828\tAA',
+    'rs671\t12\t111766860\tAG','rs1800566\t16\t69745145\tAA',
+  ];
+  const g=parseDNA(lines.join('\n'));
+  document.getElementById('file-chip').textContent='demo-23andme.txt';
+  document.getElementById('file-chip').style.display='';
+  document.getElementById('reset-btn').style.display='';
+  runAnalysis(g);
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function showResults(){
+  document.getElementById('upload-section').style.display='none';
+  document.getElementById('results-section').style.display='block';
+}
+
+function resetApp(){
+  document.getElementById('upload-section').style.display='block';
+  document.getElementById('results-section').style.display='none';
+  document.getElementById('file-chip').style.display='none';
+  document.getElementById('reset-btn').style.display='none';
+  document.getElementById('file-input').value='';
+  userGenos={};results=[];
+}
+
+function setLoading(msg){
+  document.getElementById('loading-text').textContent=msg;
+  document.getElementById('loading').classList.add('show');
+}
+function hideLoading(){document.getElementById('loading').classList.remove('show');}
+</script>
+</body>
+</html>
